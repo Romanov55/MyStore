@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { observer } from 'mobx-react';
 import { Context } from '../index';
-import { Button, Card } from "react-bootstrap";
+import { Button, ListGroup } from "react-bootstrap";
 import { deleteBrand, fetchBrands } from "../http/deviceAPI";
 
 const BrandBar = observer(() => {
@@ -20,15 +20,14 @@ const BrandBar = observer(() => {
         
     }
 
-
     return (
-        <div className="d-flex flex-row flex-wrap">
-            {device.brands.map(brand => 
-                <Card
+        <ListGroup>
+            {device.brandsVisable && device.brands.map(brand => 
+                <ListGroup.Item
                     style={{cursor:'pointer'}}
                     border={brand.id === device.selectedBrand.id ? 'danger' : 'light'}
                     key={brand.id}
-                    className="p-3 m-1"
+                    className="p-3 d-flex justify-content-between "
                     onClick={() => device.setSelectedBrand(brand)}
                 >
                     {brand.name}
@@ -39,9 +38,9 @@ const BrandBar = observer(() => {
                     >
                         Удалить
                     </Button>
-                </Card>
+                </ListGroup.Item>
             )}
-        </div>
+        </ListGroup>
     );
 });
 

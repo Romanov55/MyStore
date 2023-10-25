@@ -1,22 +1,32 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { createBrand } from "../../http/deviceAPI";
+import { createBrand, fetchBrands } from "../../http/deviceAPI";
+import { Context } from "../..";
 
 const CreateBrand = ({show, onHide}) => {
+    const { device } = useContext(Context);
     const [value, setValue] = useState('')
     const [error, setError] = useState('');
 
-    const addBrand = () => {
+    const addBrand = async () => {
         if (!value.trim()) {
             setError('Поле не должно быть пустым')
             return;
         }
 
-        createBrand({name: value}).then(data => {
-            setValue('')
-            onHide()
-        })
-    }
+        try {
+            await createBrand({ name: value });
+            await fetchBrands(); // Загрузить обновленный список брендов
+            
+            // Обновить бренды в хранилище MobX
+            device.setBrands(await fetchBrands());
+            
+            setValue("");
+            onHide();
+        } catch (error) {
+            setError("Ошибка при добавлении бренда: " + error.message);
+        }
+    };
 
     return (
         <Modal

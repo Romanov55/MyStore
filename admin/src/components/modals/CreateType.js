@@ -1,21 +1,31 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { createType } from "../../http/deviceAPI";
+import { createType, fetchTypes } from "../../http/deviceAPI";
+import { Context } from "../..";
 
 const CreateType = ({show, onHide}) => {
+    const { device } = useContext(Context);
     const [value, setValue] = useState('')
     const [error, setError] = useState('');
 
-    const addType = () => {
+    const addType = async () => {
         if (!value.trim()) {
             setError('Поле не должно быть пустым')
             return;
         }
 
-        createType({name: value}).then(data => {
+        try {
+            createType({name: value})
+            await fetchTypes(); // Загрузить обновленный список брендов
+            
+            device.setTypes(await fetchTypes());
+
             setValue('')
             onHide()
-        })
+        } catch (error) {
+            setError("Ошибка при добавлении категории: " + error.message);
+        }
+
     }
     
     return (

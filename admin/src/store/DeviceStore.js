@@ -9,7 +9,10 @@ export default class DeviceStore {
         this._selectedBrand = {}
         this._page = 1
         this._totalCount = 0
-        this._limit = 9
+        this._limit = 10
+        this._brandsVisable = false
+        this._typesVisable = false
+        this._devicesVisable = false
         makeAutoObservable(this)
     }
 
@@ -41,6 +44,17 @@ export default class DeviceStore {
         this._totalCount = count
     }
 
+    setBrandsVisable(is) {
+        this._brandsVisable = is
+    }
+
+    setTypesVisable(is) {
+        this._typesVisable = is
+    }
+
+    setDevicesVisable(is) {
+        this._devicesVisable = is
+    }
 
     get types() {
         return this._types
@@ -74,5 +88,17 @@ export default class DeviceStore {
 
     get limit() {
         return this._limit
+    }
+
+    get brandsVisable() {
+        return this._brandsVisable
+    }
+
+    get typesVisable() {
+        return this._typesVisable
+    }
+
+    get devicesVisable() {
+        return this._devicesVisable
     }
 }

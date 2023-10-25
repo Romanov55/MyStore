@@ -41,7 +41,6 @@ function DevicePage() {
         // Обновляем данные в локальном хранилище
         localStorage.setItem('basket', JSON.stringify(existingBasket));
     }
-    
 
     return (
         <Container className="mt-3">

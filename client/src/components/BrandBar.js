@@ -1,25 +1,10 @@
 import React, { useContext } from "react";
 import { observer } from 'mobx-react';
 import { Context } from '../index';
-import { Button, Card } from "react-bootstrap";
-import { deleteBrand, fetchBrands } from "../http/deviceAPI";
+import { Card } from "react-bootstrap";
 
 const BrandBar = observer(() => {
     const { device } = useContext(Context);
-
-    // Удаление бренда
-    const handleDeleteBrand = async (brandId) => {
-        try {
-            await deleteBrand(brandId);
-            await fetchBrands()
-            // обновление брендов на странице
-            device.setBrands(await fetchBrands());
-        } catch (error) {
-            console.error("Ошибка при удалении бренда:", error);
-        }
-        
-    }
-
 
     return (
         <div className="d-flex flex-row flex-wrap">
@@ -32,13 +17,6 @@ const BrandBar = observer(() => {
                     onClick={() => device.setSelectedBrand(brand)}
                 >
                     {brand.name}
-                    <Button
-                        variant="danger"
-                        className="mt-2"
-                        onClick={() => handleDeleteBrand(brand.id)}
-                    >
-                        Удалить
-                    </Button>
                 </Card>
             )}
         </div>

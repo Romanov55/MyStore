@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Modal, Button, Form, Dropdown, Col } from "react-bootstrap";
 import { Context } from "../..";
 import { useState } from "react";
-import { createDevice, fetchBrands, fetchTypes } from "../../http/deviceAPI";
+import { createDevice, fetchBrands, fetchDevices, fetchTypes } from "../../http/deviceAPI";
 import { observer } from "mobx-react";
 
 const CreateDevice = observer(({show, onHide}) => {
@@ -33,16 +33,29 @@ const CreateDevice = observer(({show, onHide}) => {
         setInfo(info.map(i => i.number === number ? {...i, [key]: value} : i))
     }
 
-    const addDevice = () => {
-        const formData = new FormData()
-        formData.append('name', name)
-        formData.append('price', `${price}`)
-        formData.append('img', file)
-        formData.append('brandId', device.selectedBrand.id)
-        formData.append('typeId', device.selectedType.id)
-        formData.append('info', JSON.stringify(info))
-        createDevice(formData).then(data => onHide())
+    const addDevice = async () => {
+        try {
+            const formData = new FormData()
+            formData.append('name', name)
+            formData.append('price', `${price}`)
+            formData.append('img', file)
+            formData.append('brandId', device.selectedBrand.id)
+            formData.append('typeId', device.selectedType.id)
+            formData.append('info', JSON.stringify(info))
+    
+            // Создание устройства
+            await createDevice(formData);
+    
+            // После успешного создания, обновите список устройств
+            const data = await fetchDevices(device.page, device.limit);
+            device.setDevices(data.rows);
+    
+            onHide(); // Закрыть модальное окно после успешного создания
+        } catch (error) {
+            console.error("Ошибка при создании устройства:", error);
+        }
     }
+    
 
     return (
         <Modal

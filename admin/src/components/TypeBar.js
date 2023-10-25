@@ -7,11 +7,11 @@ import { deleteType, fetchTypes } from "../http/deviceAPI";
 const TypeBar = observer(() => {
     const {device} = useContext(Context)
 
-    // Удаление бренда
+    // Удаление типа
     const handleDeleteType = async (typeId) => {
         try {
             await deleteType(typeId);
-            await fetchTypes()
+
             // обновление брендов на странице
             device.setTypes(await fetchTypes());
         } catch (error) {
@@ -22,13 +22,13 @@ const TypeBar = observer(() => {
 
     return (
         <ListGroup>
-            {device.types.map(type => 
+            {device.typesVisable && device.types.map(type => 
                 <ListGroup.Item
                     style={{cursor:'pointer'}}
                     active={type.id === device.selectedType.id}
                     onClick={() => device.setSelectedType(type)}
                     key={type.id}
-                    className="p-3"
+                    className="p-3 d-flex justify-content-between"
                 >
                     {type.name}
                     <Button
