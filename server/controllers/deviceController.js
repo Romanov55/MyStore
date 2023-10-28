@@ -80,15 +80,20 @@ class DeviceController {
 
         let devices;
 
+        // Получаем устройства в зависимости от параметров запроса, включая DeviceImage
+        const includeOptions = [
+            { model: DeviceImage, as: 'device_images' }
+        ];
+
         // Получаем устройства в зависимости от параметров запроса
         if (!brandId && !typeId) {
-            devices = await Device.findAndCountAll({ limit, offset });
+            devices = await Device.findAndCountAll({ limit, offset, include: includeOptions });
         } else if (brandId && !typeId) {
-            devices = await Device.findAndCountAll({ where: { brandId }, limit, offset });
+            devices = await Device.findAndCountAll({ where: { brandId }, limit, offset, include: includeOptions });
         } else if (!brandId && typeId) {
-            devices = await Device.findAndCountAll({ where: { typeId }, limit, offset });
+            devices = await Device.findAndCountAll({ where: { typeId }, limit, offset, include: includeOptions });
         } else {
-            devices = await Device.findAndCountAll({ where: { typeId, brandId }, limit, offset });
+            devices = await Device.findAndCountAll({ where: { typeId, brandId }, limit, offset, include: includeOptions });
         }
 
         return res.json(devices);

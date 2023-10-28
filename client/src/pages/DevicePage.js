@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Container, Image } from "react-bootstrap";
+import { Button, Card, Col, Container } from "react-bootstrap";
 import bagStar from '../components/assets/bigStar.png'
 import { useParams } from "react-router-dom/cjs/react-router-dom";
 import { fetchOneDevice } from "../http/deviceAPI";
+import ImgController from "../components/ImgController";
 
 function DevicePage() {
     const [device, setDevice] = useState({ info: [] });
@@ -47,7 +48,7 @@ function DevicePage() {
             <div className="d-flex">
                 <Col md={4}>
                     {/* Отображение изображения устройства */}
-                    <Image width={300} height={300} src={process.env.REACT_APP_API_URL + device.img}></Image>
+                    <ImgController device={device}/>
                 </Col>
                 <Col md={4}>
                     <div className="d-flex flex-column align-items-center">
@@ -69,7 +70,7 @@ function DevicePage() {
                     >
                         <h3 className="d-flex justify-content-center">{device.price} Т</h3>
                         {/* Кнопка для добавления в корзину */}
-                        <Button variant="outline-dark" className="m-3" onClick={() => addProductBasket(device.id, device.name, device.price, device.img)}>Добавить в корзину</Button>
+                        <Button variant="outline-dark" className="m-3" onClick={() => addProductBasket(device.id, device.name, device.price, device.device_images[0].url)}>Добавить в корзину</Button>
                     </Card>
                 </Col>
             </div>
