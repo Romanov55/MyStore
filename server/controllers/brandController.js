@@ -57,6 +57,7 @@ class BrandController {
         try {
             const { id } = req.params;
             const { name } = req.body;
+            
 
             if (!id) {
                 return next(ApiError.badRequest("Не указан ID бренда"));

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { Device, DeviceInfo } from '../models/models.js';
+import { Device, DeviceInfo, DeviceImage } from '../models/models.js';
 import ApiError from '../error/ApiError.js';
 import fs from 'fs';
 
@@ -15,7 +15,7 @@ class DeviceController {
         try {
             // Извлекаем данные из запроса
             let { name, price, brandId, typeId, info } = req.body;
-            const { img } = req.files;
+            const { images } = req.files;
 
             // Проверка на обязательные поля
             if (!name || !price || !brandId || !typeId) {
@@ -23,14 +23,33 @@ class DeviceController {
             }
 
             // Проверка на наличие изображения
-            if (!img) {
+            if (!images) {
                 return next(ApiError.badRequest('Изображение не загружено'));
             }
 
-            // Генерируем уникальное имя файла с помощью uuid
-            let fileName = uuidv4() + ".jpg";
-            img.mv(path.resolve(__dirname, '..', 'static', fileName));
-            const device = await Device.create({ name, price, brandId, typeId, img: fileName });
+            // Генерируем уникальное имя файлов с помощью uuid
+            const imageUrls = [];
+            if (Array.isArray(images)) {
+                // images - это массив изображений
+                for (const image of images) {
+                    const fileName = uuidv4() + ".jpg";
+                    image.mv(path.resolve(__dirname, '..', 'static', fileName));
+                    imageUrls.push(fileName);
+                }
+            } else {
+                // images - это единственное изображение
+                const fileName = uuidv4() + ".jpg";
+                images.mv(path.resolve(__dirname, '..', 'static', fileName));
+                imageUrls.push(fileName);
+            }
+            
+            const device = await Device.create({ name, price, brandId, typeId });
+            
+            for (const imageUrl of imageUrls) {
+                // Создайте запись в таблице DeviceImage
+                await DeviceImage.create({ deviceId: device.id, url: imageUrl });
+            }
+            
 
             // Если есть информация о устройстве, добавляем ее
             if (info) {
@@ -56,7 +75,7 @@ class DeviceController {
     async getAll(req, res, next) {
         let { brandId, typeId, limit, page } = req.query;
         page = page || 1;
-        limit = limit || 9;
+        limit = limit || 10;
         let offset = page * limit - limit;
 
         let devices;
@@ -80,7 +99,10 @@ class DeviceController {
         const { id } = req.params;
         const device = await Device.findOne({
             where: { id },
-            include: [{ model: DeviceInfo, as: 'device_infos' }]
+            include: [
+                { model: DeviceInfo, as: 'device_infos',  },
+                { model: DeviceImage, as: 'device_images' }
+            ]
         });
 
         // Проверка на существование устройства
@@ -95,30 +117,99 @@ class DeviceController {
     async delete(req, res, next) {
         try {
             const { id } = req.params;
-
+    
             if (!id) {
                 return next(ApiError.badRequest("Не указан ID устройства"));
             }
-
+    
             const device = await Device.findByPk(id);
-
+    
             if (!device) {
                 return next(ApiError.notFound("Устройство не найдено"));
             }
-
-            // Удалите файл изображения (если это необходимо)
-            const imagePath = path.resolve(__dirname, '..', 'static', device.img);
-            fs.unlinkSync(imagePath);
-
+    
+            // Получаем список связанных изображений
+            const deviceImages = await DeviceImage.findAll({ where: { deviceId: device.id } });
+    
+            // Удаляем файлы изображений
+            for (const deviceImage of deviceImages) {
+                const imagePath = path.resolve(__dirname, '..', 'static', deviceImage.url);
+                fs.unlinkSync(imagePath);
+            }
+    
+            // Удалить связанные изображения из базы данных
+            await DeviceImage.destroy({ where: { deviceId: device.id } });
+    
+            // Удалите само устройство
             await device.destroy();
-
-            return res.json({ message: "Устройство успешно удалено" });
+    
+            return res.json({ message: "Устройство и связанные изображения успешно удалены" });
         } catch (error) {
             console.error('Ошибка при удалении устройства', error);
             next(ApiError.internal(error.message));
         }
     }
 
+    async update(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { name, price, brandId, typeId, info } = req.body;
+    
+            if (!id) {
+                return next(ApiError.badRequest("Не указан ID устройства"));
+            }
+    
+            const device = await Device.findByPk(id);
+    
+            if (!device) {
+                return next(ApiError.notFound("Устройство не найдено"));
+            }
+    
+            if (name) {
+                device.name = name;
+            }
+    
+            if (price) {
+                device.price = price;
+            }
+    
+            if (brandId) {
+                device.brandId = brandId;
+            }
+    
+            if (typeId) {
+                device.typeId = typeId;
+            }
+    
+            if (info) {
+                const parsedInfo = JSON.parse(info);
+                await DeviceInfo.destroy({ where: { deviceId: id } });
+    
+                parsedInfo.forEach(i => 
+                    DeviceInfo.create({
+                        title: i.title,
+                        description: i.description,
+                        deviceId: device.id
+                    })
+                );
+            }
+    
+            if (req.files && req.files.img) {
+                const { img } = req.files;
+                const fileName = uuidv4() + ".jpg";
+                img.mv(path.resolve(__dirname, '..', 'static', fileName));
+                device.img = fileName;
+            }
+    
+            await device.save();
+    
+            return res.json(device);
+        } catch (error) {
+            console.error('Ошибка при обновлении устройства', error);
+            next(ApiError.internal(error.message));
+        }
+    }
+    
 }
 
 export default new DeviceController();

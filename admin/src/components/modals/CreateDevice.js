@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Modal, Button, Form, Dropdown, Col } from "react-bootstrap";
+import { Modal, Button, Form, Dropdown, Col, Card } from "react-bootstrap";
 import { Context } from "../..";
 import { useState } from "react";
 import { createDevice, fetchBrands, fetchDevices, fetchTypes } from "../../http/deviceAPI";
@@ -9,8 +9,9 @@ const CreateDevice = observer(({show, onHide}) => {
     const {device} = useContext(Context)
     const [name, setName] = useState('')
     const [price, setPrice] = useState(0)
-    const [file, setFile] = useState(null)
+    const [files, setFiles] = useState([]);
     const [info, setInfo] = useState([])
+    
 
     useEffect(() => {
         fetchTypes().then(data => device.setTypes(data))
@@ -25,9 +26,16 @@ const CreateDevice = observer(({show, onHide}) => {
         setInfo(info.filter(i => i.number !== number))
     }
 
-    const selectFile = e => {
-        setFile(e.target.files[0])
-    }
+    const selectFile = (e) => {
+        const selectedFiles = e.target.files;
+        setFiles([...files, ...selectedFiles]); // Add selected files to the array
+    };
+
+    const removeFile = (index) => {
+        const newFiles = [...files];
+        newFiles.splice(index, 1);
+        setFiles(newFiles);
+    };
 
     const changeInfo = (key, value, number) => {
         setInfo(info.map(i => i.number === number ? {...i, [key]: value} : i))
@@ -35,13 +43,23 @@ const CreateDevice = observer(({show, onHide}) => {
 
     const addDevice = async () => {
         try {
-            const formData = new FormData()
-            formData.append('name', name)
-            formData.append('price', `${price}`)
-            formData.append('img', file)
-            formData.append('brandId', device.selectedBrand.id)
-            formData.append('typeId', device.selectedType.id)
-            formData.append('info', JSON.stringify(info))
+            if (!device.selectedType || !device.selectedBrand || !name || !price) {
+                // Проверка на обязательные поля
+                console.error("Заполните все обязательные поля.");
+                return;
+            }
+    
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("price", price);
+            formData.append("brandId", device.selectedBrand.id);
+            formData.append("typeId", device.selectedType.id);
+            formData.append("info", JSON.stringify(info));
+    
+            // Добавление изображений
+            for (let i = 0; i < files.length; i++) {
+                formData.append("images", files[i]);
+            }
     
             // Создание устройства
             await createDevice(formData);
@@ -50,12 +68,18 @@ const CreateDevice = observer(({show, onHide}) => {
             const data = await fetchDevices(device.page, device.limit);
             device.setDevices(data.rows);
     
+            // Сбросить значения полей формы
+            setName('');
+            setPrice(0);
+            setFiles([]);
+            setInfo([]);
+    
             onHide(); // Закрыть модальное окно после успешного создания
         } catch (error) {
             console.error("Ошибка при создании устройства:", error);
+            // Добавьте обработку ошибок для информирования пользователя
         }
-    }
-    
+    };
 
     return (
         <Modal
@@ -114,7 +138,18 @@ const CreateDevice = observer(({show, onHide}) => {
                         className="mt-3"
                         type="file"
                         onChange={selectFile}
+                        multiple // Allow multiple file selection
                     />
+                    {files.length > 0 && (
+                        <div className="d-flex">
+                            {files.map((file, index) => (
+                                <Card key={index} className="mt-2 me-2 p-1 d-flex flex-column flex-wrap">
+                                    <img className="mb-2" src={URL.createObjectURL(file)} alt={`Выбранное изображение`} style={{ maxWidth: "100px" }} />
+                                    <Button variant="outline-danger" onClick={() => removeFile(index)}>Удалить</Button>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
                     <br/>
                     <Button
                         variant={"outline-dark"}

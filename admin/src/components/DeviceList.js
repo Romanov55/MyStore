@@ -1,13 +1,14 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { observer } from 'mobx-react';
 import { Context } from '../index';
 import DeviceItem from "./DeviceItem";
 import { Button } from "react-bootstrap";
 import { deleteDevice, fetchDevices } from "../http/deviceAPI";
 import Pages from "./Pages";
+import UpdateDevice from "./modals/updateDevice";
 
 const DeviceList = observer(() => {
-    const {device} = useContext(Context)
+    const { device } = useContext(Context);
 
     // Удаление девайса
     const handleDeleteDevice = async (deviceId) => {
@@ -24,21 +25,37 @@ const DeviceList = observer(() => {
         }
     };
 
+    const [visibleDevices, setVisibleDevices] = useState({});
+
+    const toggleDeviceVisibility = (deviceId) => {
+        // Обновить видимость для конкретного устройства
+        setVisibleDevices({
+            ...visibleDevices,
+            [deviceId]: !visibleDevices[deviceId]
+        });
+    };
+
     return (
         <div>
             <div className="d-flex flex-wrap">
-                {device.devicesVisable && Array.isArray(device.devices) && device.devices.map(device => 
-                    <div key={device.id}>
-                        <DeviceItem device={device}/>
-                        <Button className="d-flex justify-content-center" variant="danger" onClick={() => handleDeleteDevice(device.id)}>
+                {device.devicesVisable && Array.isArray(device.devices) && device.devices.map(item => 
+                    <div 
+                        key={item.id}
+                        onClick={() => toggleDeviceVisibility(item.id)}
+                    >
+                        <DeviceItem device={item}/>
+                        <Button className="d-flex justify-content-center" variant="danger" onClick={() => handleDeleteDevice(item.id)}>
                             Удалить
                         </Button>
+                        <UpdateDevice show={visibleDevices[item.id]} onHide={() => toggleDeviceVisibility(item.id)} deviceToUpdate={item} />
                     </div>
+                    
                 )}
             </div>
             {device.devicesVisable && <Pages />}
+            
         </div>
-    )
+    );
 });
 
 export default DeviceList;

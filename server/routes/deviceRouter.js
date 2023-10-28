@@ -8,5 +8,6 @@ router.post('/', checkRole('ADMIN'), deviceController.create)
 router.get('/', deviceController.getAll)
 router.get('/:id', deviceController.getOne)
 router.delete('/:id', deviceController.delete);
+router.put('/:id', deviceController.update)
 
 export default router;

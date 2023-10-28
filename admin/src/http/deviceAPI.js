@@ -15,6 +15,11 @@ export const deleteType = async (typeId) => {
     return data;
 }
 
+export const updateType = async (typeId, updatedTypeData) => {
+    const { data } = await $authHost.put(`api/type/${typeId}`, updatedTypeData);
+    return data;
+}
+
 export const createBrand = async (brand) => {
     const {data} = await $authHost.post('api/brand', brand)
     return data
@@ -27,6 +32,11 @@ export const fetchBrands = async () => {
 
 export const deleteBrand = async (brandId) => {
     const { data } = await $authHost.delete(`api/brand/${brandId}`);
+    return data;
+}
+
+export const updateBrand = async (brandId, updatedBrandData) => {
+    const { data } = await $authHost.put(`api/brand/${brandId}`, updatedBrandData);
     return data;
 }
 
@@ -50,4 +60,9 @@ export const fetchOneDevice = async (id) => {
 export const deleteDevice = async (id) => {
     const {data} = await $host.delete(`api/device/${id}`)
     return data
+}
+
+export const updateDevice = async (id, updatedData) => {
+    const { data } = await $host.put(`api/device/${id}`, updatedData);
+    return data;
 }

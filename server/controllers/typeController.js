@@ -43,6 +43,37 @@ class TypeController {
             next(ApiError.internal(error.message));
         }
     }
+
+    async update(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { name } = req.body;
+            
+
+            if (!id) {
+                return next(ApiError.badRequest("Не указан ID категории"));
+            }
+
+            if (!name) {
+                return next(ApiError.badRequest("Требуется название"));
+            }
+
+            const type = await Type.findByPk(id);
+
+
+            if (!type) {
+                return next(ApiError.notFound("Категория не найдена"));
+            }
+
+            type.name = name; // Обновляем значение имени бренда
+            await type.save(); // Сохраняем изменения
+
+            return res.json(type); // Вернуть успешный результат (измененный бренд)
+        } catch (error) {
+            console.error('Ошибка при изменении категории', error);
+            next(ApiError.internal(error.message));
+        }
+    }
 }
 
 export default new TypeController();

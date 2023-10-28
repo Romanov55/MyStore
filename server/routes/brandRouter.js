@@ -9,5 +9,6 @@ const router = new Router();
 router.post('/', checkRole('ADMIN'), brandController.create)
 router.get('/', brandController.getAll)
 router.delete('/:id', brandController.delete)
+router.put('/:id', checkRole('ADMIN'), brandController.update)
 
 export default router;
