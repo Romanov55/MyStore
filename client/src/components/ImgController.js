@@ -15,8 +15,19 @@ const ImageController = ({ device }) => {
     }, [device]);
 
     return (
-        <div>
-            <div className="main-image">
+        <div className='d-flex'>
+            <div className="thumbnail-device d-flex flex-column overflow-y-auto" style={{width : '30%', height : 300}}>
+                {device.device_images && device.device_images.map((image, index) => (
+                    <img
+                        style={{ width: '100%' }}
+                        key={index}
+                        src={process.env.REACT_APP_API_URL + image.url}
+                        alt={image.name}
+                        onClick={() => handleImageClick(process.env.REACT_APP_API_URL + image.url)}
+                    />
+                ))}
+            </div>
+            <div className="main-image" style={{ width: '70%' }}>
                 {selectedImage && (
                     <img
                         style={{ width: '100%' }}
@@ -24,17 +35,6 @@ const ImageController = ({ device }) => {
                         alt={selectedImage && device.device_images.find(image => image.url === selectedImage)?.name}
                     />
                 )}
-            </div>
-            <div className="thumbnail-device">
-                {device.device_images && device.device_images.map((image, index) => (
-                    <img
-                        style={{ width: 150 }}
-                        key={index}
-                        src={process.env.REACT_APP_API_URL + image.url}
-                        alt={image.name}
-                        onClick={() => handleImageClick(process.env.REACT_APP_API_URL + image.url)}
-                    />
-                ))}
             </div>
         </div>
     );

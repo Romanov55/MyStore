@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Modal, Button, Form, Dropdown, Col } from "react-bootstrap";
+import { Modal, Button, Form, Dropdown, Col, Card } from "react-bootstrap";
 import { Context } from "../..";
 import { fetchBrands, fetchTypes } from "../../http/deviceAPI";
 import { observer } from "mobx-react";
@@ -8,7 +8,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     const { device } = useContext(Context);
     const [name, setName] = useState(deviceToUpdate.name);
     const [price, setPrice] = useState(deviceToUpdate.price);
-    const [file, setFile] = useState(deviceToUpdate.img);
+    const [files, setFiles] = useState(deviceToUpdate.device_images);
     const [info, setInfo] = useState(deviceToUpdate.info || []);
     const [selectedType, setSelectedType] = useState(deviceToUpdate.typeId); // Выбранный тип
     const [selectedBrand, setSelectedBrand] = useState(deviceToUpdate.brandId); // Выбранный бренд
@@ -19,7 +19,14 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     }, [device]);
 
     const selectFile = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFiles = e.target.files;
+        setFiles([...files, ...selectedFiles]); // Add selected files to the array
+    };
+
+    const removeFile = (index) => {
+        const newFiles = [...files];
+        newFiles.splice(index, 1);
+        setFiles(newFiles);
     };
 
     const changeInfo = (key, value, number) => {
@@ -31,19 +38,35 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
             const formData = new FormData();
             formData.append("name", name);
             formData.append("price", `${price}`);
-            formData.append("img", file);
             formData.append("brandId", device.selectedBrand.id);
             formData.append("typeId", selectedType); // Используем выбранный тип
             formData.append("info", JSON.stringify(info));
-
+    
+            // Создание массива для изображений
+            const imagesArray = [];
+    
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].url) {
+                    // Если это объект с URL, добавляем его в массив
+                    imagesArray.push(files[i].url);
+                } else {
+                    // Если это файл, добавляем его в массив
+                    formData.append("img", files[i]);
+                }
+            }
+    
+            // Добавляем массив изображений в FormData
+            formData.append("device_images", JSON.stringify(imagesArray));
+    
             // Обновление устройства
             await updateDevice(deviceToUpdate.id, formData);
-
+    
             onHide(); // Закрыть модальное окно после успешного обновления
         } catch (error) {
             console.error("Ошибка при обновлении устройства:", error);
         }
     };
+    
 
     return (
         <Modal onClick={(e) => e.stopPropagation()} show={show} onHide={onHide} size="lg" centered>
@@ -100,6 +123,23 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
                         type="number"
                     />
                     <Form.Control className="mt-3" type="file" onChange={selectFile} />
+                    <div className="d-flex">
+                    {files.length > 0 && (
+                        <div className="d-flex">
+                            {files.map((file, index) => (
+                                <Card key={index} className="mt-2 me-2 p-1 d-flex flex-column flex-wrap">
+                                    <img
+                                        className="mb-2"
+                                        src={file.url ? process.env.REACT_APP_API_URL + file.url : URL.createObjectURL(file)}
+                                        alt={`Выбранное изображение`}
+                                        style={{ maxWidth: "100px" }}
+                                    />
+                                    <Button variant="outline-danger" onClick={() => removeFile(index)}>Удалить</Button>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                    </div>
                     <br />
                     {info.map((i) => (
                         <div className="d-flex mt-1" key={i.number}>

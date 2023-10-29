@@ -49,7 +49,6 @@ class DeviceController {
                 // Создайте запись в таблице DeviceImage
                 await DeviceImage.create({ deviceId: device.id, url: imageUrl });
             }
-            
 
             // Если есть информация о устройстве, добавляем ее
             if (info) {
@@ -158,7 +157,7 @@ class DeviceController {
     async update(req, res, next) {
         try {
             const { id } = req.params;
-            const { name, price, brandId, typeId, info } = req.body;
+            const { name, price, brandId, typeId, info, device_images } = req.body;
     
             if (!id) {
                 return next(ApiError.badRequest("Не указан ID устройства"));
@@ -199,11 +198,19 @@ class DeviceController {
                 );
             }
     
-            if (req.files && req.files.img) {
-                const { img } = req.files;
-                const fileName = uuidv4() + ".jpg";
-                img.mv(path.resolve(__dirname, '..', 'static', fileName));
-                device.img = fileName;
+            if (device_images) {
+                // Удалите существующие изображения привязанные к устройству
+                await DeviceImage.destroy({ where: { deviceId: id } });
+    
+                // Создайте записи для новых изображений
+                const imageArray = JSON.parse(device_images);
+    
+                imageArray.forEach(async (image) => {
+                    await DeviceImage.create({
+                        url: image,
+                        deviceId: device.id
+                    });
+                });
             }
     
             await device.save();
@@ -213,8 +220,7 @@ class DeviceController {
             console.error('Ошибка при обновлении устройства', error);
             next(ApiError.internal(error.message));
         }
-    }
-    
+    }    
 }
 
 export default new DeviceController();

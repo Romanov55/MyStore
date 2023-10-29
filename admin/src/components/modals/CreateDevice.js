@@ -10,8 +10,7 @@ const CreateDevice = observer(({show, onHide}) => {
     const [name, setName] = useState('')
     const [price, setPrice] = useState(0)
     const [files, setFiles] = useState([]);
-    const [info, setInfo] = useState([])
-    
+    const [info, setInfo] = useState([]);
 
     useEffect(() => {
         fetchTypes().then(data => device.setTypes(data))

@@ -4,8 +4,9 @@ import bagStar from '../components/assets/bigStar.png'
 import { useParams } from "react-router-dom/cjs/react-router-dom";
 import { fetchOneDevice } from "../http/deviceAPI";
 import ImgController from "../components/ImgController";
+import { observer } from "mobx-react-lite";
 
-function DevicePage() {
+const DevicePage = observer(() => {
     const [device, setDevice] = useState({ info: [] });
     const { id } = useParams();
 
@@ -85,6 +86,6 @@ function DevicePage() {
             </div>
         </Container>
     );
-}
+})
 
 export default DevicePage;
