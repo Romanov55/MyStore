@@ -9,7 +9,15 @@ const DeviceItem = ({device}) => {
         <Col md={2} className="m-3">
             <Card style={{width: 150, cursor: 'pointer'}} border={'light'}>
                 {/* Переберите изображения device_images и отобразите их */}
-                <Image width={150} height={150} src={process.env.REACT_APP_API_URL + device.device_images[0].url} />
+                <Image
+                    width={150}
+                    height={150}
+                    src={
+                        device.device_images[0] && device.device_images[0].url
+                        ? process.env.REACT_APP_API_URL + device.device_images[0].url
+                        : ''
+                    }
+                />
                 <div className="text-black-50 d-flex justify-content-between align-items-center mt-1">
                     <div>{device.brand}</div>
                     <div className="d-flex align-items-center">

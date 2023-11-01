@@ -67,6 +67,6 @@ export const deleteDevice = async (id) => {
 }
 
 export const updateDevice = async (id, updatedData) => {
-    const { data } = await $host.put(`api/device/${id}`, updatedData);
+    const { data } = await $host.patch(`api/device/${id}`, updatedData);
     return data;
 }

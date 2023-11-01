@@ -157,8 +157,9 @@ class DeviceController {
     async update(req, res, next) {
         try {
             const { id } = req.params;
-            const { name, price, brandId, typeId, info, device_images } = req.body;
-    
+            const { name, price, brandId, typeId, info } = req.body;
+            const { images_new } = req.files;
+            
             if (!id) {
                 return next(ApiError.badRequest("Не указан ID устройства"));
             }
@@ -169,6 +170,7 @@ class DeviceController {
                 return next(ApiError.notFound("Устройство не найдено"));
             }
     
+            // Обновление свойств устройства
             if (name) {
                 device.name = name;
             }
@@ -197,22 +199,32 @@ class DeviceController {
                     })
                 );
             }
-    
-            if (device_images) {
-                // Удалите существующие изображения привязанные к устройству
-                await DeviceImage.destroy({ where: { deviceId: id } });
-    
-                // Создайте записи для новых изображений
-                const imageArray = JSON.parse(device_images);
-    
-                imageArray.forEach(async (image) => {
-                    await DeviceImage.create({
-                        url: image,
-                        deviceId: device.id
-                    });
-                });
+        
+            if (images_new) {
+                // Генерируем уникальное имя файлов с помощью uuid
+                const imageUrls = [];
+                if (Array.isArray(images_new)) {
+                    // images - это массив изображений
+                    for (const image of images_new) {
+                        const fileName = uuidv4() + ".jpg";
+                        image.mv(path.resolve(__dirname, '..', 'static', fileName));
+                        imageUrls.push(fileName);
+                    }
+                } else {
+                    // images_new - это единственное изображение
+                    const fileName = uuidv4() + ".jpg";
+                    images_new.mv(path.resolve(__dirname, '..', 'static', fileName));
+                    imageUrls.push(fileName);
+                }
+                
+                for (const imageUrl of imageUrls) {
+                    // Создайте запись в таблице DeviceImage
+                    await DeviceImage.create({ deviceId: device.id, url: imageUrl });
+                }
             }
+            
     
+            // Сохраните обновленное устройство
             await device.save();
     
             return res.json(device);
@@ -220,7 +232,7 @@ class DeviceController {
             console.error('Ошибка при обновлении устройства', error);
             next(ApiError.internal(error.message));
         }
-    }    
+    }
 }
 
 export default new DeviceController();

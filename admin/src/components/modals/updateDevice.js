@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Modal, Button, Form, Dropdown, Col, Card } from "react-bootstrap";
 import { Context } from "../..";
-import { fetchBrands, fetchTypes } from "../../http/deviceAPI";
+import { fetchBrands, fetchTypes, updateDevice } from "../../http/deviceAPI";
 import { observer } from "mobx-react";
 
 const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
@@ -33,12 +33,12 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
         setInfo(info.map((i) => (i.number === number ? { ...i, [key]: value } : i)));
     };
 
-    const updateDevice = async () => {
+    const updateDeviceOnServer = async () => {
         try {
             const formData = new FormData();
             formData.append("name", name);
-            formData.append("price", `${price}`);
-            formData.append("brandId", device.selectedBrand.id);
+            formData.append("price", price);
+            formData.append("brandId", selectedBrand);
             formData.append("typeId", selectedType); // Используем выбранный тип
             formData.append("info", JSON.stringify(info));
     
@@ -46,17 +46,18 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
             const imagesArray = [];
     
             for (let i = 0; i < files.length; i++) {
-                if (files[i].url) {
-                    // Если это объект с URL, добавляем его в массив
+                // Проверяем, является ли элемент файла (File) или объектом с URL
+                if (files[i] instanceof File) {
+                    // Если это файл, добавляем его в FormData
+                    formData.append("images_new", files[i]);
+                } else if (files[i].url) {
+                    // Если это объект с URL, добавляем его URL в массив
                     imagesArray.push(files[i].url);
-                } else {
-                    // Если это файл, добавляем его в массив
-                    formData.append("img", files[i]);
                 }
             }
     
             // Добавляем массив изображений в FormData
-            formData.append("device_images", JSON.stringify(imagesArray));
+            formData.append("images_old", imagesArray)
     
             // Обновление устройства
             await updateDevice(deviceToUpdate.id, formData);
@@ -66,7 +67,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
             console.error("Ошибка при обновлении устройства:", error);
         }
     };
-    
+
 
     return (
         <Modal onClick={(e) => e.stopPropagation()} show={show} onHide={onHide} size="lg" centered>
@@ -165,7 +166,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
                 <Button variant="outline-danger" onClick={onHide}>
                     Закрыть
                 </Button>
-                <Button variant="outline-success" onClick={updateDevice}>
+                <Button variant="outline-success" onClick={updateDeviceOnServer}>
                     Изменить
                 </Button>
             </Modal.Footer>

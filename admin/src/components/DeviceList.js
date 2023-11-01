@@ -44,7 +44,14 @@ const DeviceList = observer(() => {
                         onClick={() => toggleDeviceVisibility(item.id)}
                     >
                         <DeviceItem device={item}/>
-                        <Button className="d-flex justify-content-center" variant="danger" onClick={() => handleDeleteDevice(item.id)}>
+                        <Button
+                            className="d-flex justify-content-center"
+                            variant="danger"
+                            onClick={(e) => {
+                                e.stopPropagation(); // Предотвращение всплытия события
+                                handleDeleteDevice(item.id);
+                            }}
+                        >
                             Удалить
                         </Button>
                         <UpdateDevice show={visibleDevices[item.id]} onHide={() => toggleDeviceVisibility(item.id)} deviceToUpdate={item} />
