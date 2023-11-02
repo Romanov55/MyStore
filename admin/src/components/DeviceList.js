@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { observer } from 'mobx-react';
 import { Context } from '../index';
 import DeviceItem from "./DeviceItem";
@@ -26,6 +26,7 @@ const DeviceList = observer(() => {
     };
 
     const [visibleDevices, setVisibleDevices] = useState({});
+
 
     const toggleDeviceVisibility = (deviceId) => {
         // Обновить видимость для конкретного устройства

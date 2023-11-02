@@ -155,10 +155,11 @@ class DeviceController {
     }
 
     async update(req, res, next) {
+        
         try {
             const { id } = req.params;
-            const { name, price, brandId, typeId, info } = req.body;
-            const { images_new } = req.files;
+            const { name, price, brandId, typeId, info, images_old } = req.body;
+            const { images_new } = req.files || {};
             
             if (!id) {
                 return next(ApiError.badRequest("Не указан ID устройства"));
@@ -198,6 +199,27 @@ class DeviceController {
                         deviceId: device.id
                     })
                 );
+            }
+
+            if (images_old) {
+                const existingImages = await DeviceImage.findAll({
+                    where: { deviceId: device.id }
+                });
+            
+                // Получите массив существующих id изображений
+                const existingImageIds = existingImages.map(image => image.id);
+            
+                for (const id of existingImageIds) {
+                    // Если id изображения не существует в переданных images_old, удалите его
+                    if (!images_old.includes(id)) {
+                        const deviceImg = await DeviceImage.findByPk(id);
+                        if (deviceImg) {
+                            const imagePath = path.resolve(__dirname, '..', 'static', deviceImg.url);
+                            fs.unlinkSync(imagePath);
+                            await deviceImg.destroy();
+                        }
+                    }
+                }
             }
         
             if (images_new) {

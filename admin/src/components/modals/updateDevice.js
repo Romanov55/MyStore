@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Modal, Button, Form, Dropdown, Col, Card } from "react-bootstrap";
 import { Context } from "../..";
-import { fetchBrands, fetchTypes, updateDevice } from "../../http/deviceAPI";
+import { fetchBrands, fetchDevices, fetchTypes, updateDevice } from "../../http/deviceAPI";
 import { observer } from "mobx-react";
 
 const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
@@ -52,7 +52,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
                     formData.append("images_new", files[i]);
                 } else if (files[i].url) {
                     // Если это объект с URL, добавляем его URL в массив
-                    imagesArray.push(files[i].url);
+                    imagesArray.push(files[i].id);
                 }
             }
     
@@ -63,6 +63,9 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
             await updateDevice(deviceToUpdate.id, formData);
     
             onHide(); // Закрыть модальное окно после успешного обновления
+            const updatedDevices = await fetchDevices(1, 2); // Здесь вы можете указать нужные параметры запроса
+            device.setDevices(updatedDevices.rows);
+            device.setTotalCount(updatedDevices.count);
         } catch (error) {
             console.error("Ошибка при обновлении устройства:", error);
         }
