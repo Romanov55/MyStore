@@ -34,7 +34,7 @@ const Admin = observer(()  => {
                     <Dashboard/>
                 </Col>
                 <Col md={9}>
-                    <BrandBar />
+                    <BrandBar/>
                     <TypeBar/>
                     <DeviceList/>
                 </Col>
