@@ -66,6 +66,7 @@ const CreateDevice = observer(({show, onHide}) => {
             // После успешного создания, обновите список устройств
             const data = await fetchDevices(device.page, device.limit);
             device.setDevices(data.rows);
+            device.setTotalCount(data.count);
     
             // Сбросить значения полей формы
             setName('');

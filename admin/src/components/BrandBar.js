@@ -4,6 +4,7 @@ import { Context } from '../index';
 import { Button, ListGroup } from "react-bootstrap";
 import { deleteBrand, fetchBrands } from "../http/deviceAPI";
 import UpdateBrand from "./modals/updateBrand";
+import CreateBrand from "./modals/CreateBrand";
 
 const BrandBar = observer(() => {
     const { device } = useContext(Context);
@@ -26,6 +27,7 @@ const BrandBar = observer(() => {
     }
     
     const [visibleBrands, setVisibleBrands] = useState({}); // Хранить видимость для каждого бренда
+    const [brandVisable, setBrandVisable] = useState(false)
 
     const toggleBrandVisibility = (brandId) => {
         // Обновить видимость для конкретного бренда
@@ -36,38 +38,49 @@ const BrandBar = observer(() => {
     }
 
     return (
-        <ListGroup>
-            {device.brandsVisable && device.brands
-                .slice()
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map(brand => 
-                    <ListGroup.Item
-                        style={{cursor:'pointer'}}
-                        border={brand.id === device.selectedBrand.id ? 'danger' : 'light'}
-                        key={brand.id}
-                        className="p-3 d-flex justify-content-between "
-                        onClick={() => device.setSelectedBrand(brand)}
-                    >
-                        {brand.name}
-                        <Button 
-                            variant="outline-dark" 
-                            className="m-2"
-                            onClick={() => toggleBrandVisibility(brand.id)} // Изменить видимость бренда
+        device.brandsVisable ? (
+            <ListGroup>
+                <h3>Бренды</h3>
+                <Button 
+                    variant="outline-dark" 
+                    className="m-2"
+                    onClick={() => setBrandVisable(true)}
+                >
+                    Добавить бренд
+                </Button>
+                <CreateBrand show={brandVisable} onHide={() => setBrandVisable(false)}/>
+                {device.brands
+                    .slice()
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map(brand => 
+                        <ListGroup.Item
+                            style={{cursor:'pointer'}}
+                            border={brand.id === device.selectedBrand.id ? 'danger' : 'light'}
+                            key={brand.id}
+                            className="p-3 d-flex justify-content-between "
+                            onClick={() => device.setSelectedBrand(brand)}
                         >
-                            Изменить бренд
-                        </Button>
-                        <UpdateBrand show={visibleBrands[brand.id]} onHide={() => toggleBrandVisibility(brand.id)} brandToUpdate={brand} />
+                            {brand.name}
+                            <Button 
+                                variant="outline-dark" 
+                                className="m-2"
+                                onClick={() => toggleBrandVisibility(brand.id)} // Изменить видимость бренда
+                            >
+                                Изменить бренд
+                            </Button>
+                            <UpdateBrand show={visibleBrands[brand.id]} onHide={() => toggleBrandVisibility(brand.id)} brandToUpdate={brand} />
 
-                        <Button
-                            variant="danger"
-                            className="mt-2"
-                            onClick={() => handleDeleteBrand(brand.id)}
-                        >
-                            Удалить
-                        </Button>
-                    </ListGroup.Item>
-            )}
-        </ListGroup>
+                            <Button
+                                variant="danger"
+                                className="mt-2"
+                                onClick={() => handleDeleteBrand(brand.id)}
+                            >
+                                Удалить
+                            </Button>
+                        </ListGroup.Item>
+                )}
+            </ListGroup>
+        ) : null
     );
 });
 

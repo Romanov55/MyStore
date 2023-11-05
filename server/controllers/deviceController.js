@@ -81,6 +81,7 @@ class DeviceController {
 
         // Получаем устройства в зависимости от параметров запроса, включая DeviceImage
         const includeOptions = [
+            { model: DeviceInfo, as: 'device_infos',  },
             { model: DeviceImage, as: 'device_images' }
         ];
 

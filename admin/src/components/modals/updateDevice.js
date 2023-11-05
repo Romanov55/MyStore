@@ -9,7 +9,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     const [name, setName] = useState(deviceToUpdate.name);
     const [price, setPrice] = useState(deviceToUpdate.price);
     const [files, setFiles] = useState(deviceToUpdate.device_images);
-    const [info, setInfo] = useState(deviceToUpdate.info || []);
+    const [info, setInfo] = useState(deviceToUpdate.device_infos || []);
     const [selectedType, setSelectedType] = useState(deviceToUpdate.typeId); // Выбранный тип
     const [selectedBrand, setSelectedBrand] = useState(deviceToUpdate.brandId); // Выбранный бренд
 
@@ -32,6 +32,14 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     const changeInfo = (key, value, number) => {
         setInfo(info.map((i) => (i.number === number ? { ...i, [key]: value } : i)));
     };
+
+    const addInfo = () => {
+        setInfo([...info, {title: '', description: '', number: Date.now()}])
+    }
+
+    const removeInfo = (number) => {
+        setInfo(info.filter(i => i.number !== number))
+    }
 
     const updateDeviceOnServer = async () => {
         try {
@@ -63,14 +71,13 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
             await updateDevice(deviceToUpdate.id, formData);
     
             onHide(); // Закрыть модальное окно после успешного обновления
-            const updatedDevices = await fetchDevices(1, 2); // Здесь вы можете указать нужные параметры запроса
+            const updatedDevices = await fetchDevices(device.page, device.limit); // Здесь вы можете указать нужные параметры запроса
             device.setDevices(updatedDevices.rows);
             device.setTotalCount(updatedDevices.count);
         } catch (error) {
             console.error("Ошибка при обновлении устройства:", error);
         }
     };
-
 
     return (
         <Modal onClick={(e) => e.stopPropagation()} show={show} onHide={onHide} size="lg" centered>
@@ -145,24 +152,38 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
                     )}
                     </div>
                     <br />
-                    {info.map((i) => (
-                        <div className="d-flex mt-1" key={i.number}>
+                    <Button
+                        variant={"outline-dark"}
+                        onClick={addInfo}
+                    >
+                        Добавить новое свойство
+                    </Button>
+                    {info.map(i => 
+                        <div className="d-flex mt-1" key={i.id}>
                             <Col md={4} className="m-1">
                                 <Form.Control
                                     value={i.title}
-                                    onChange={(e) => changeInfo("title", e.target.value, i.number)}
+                                    onChange={(e) => changeInfo('title', e.target.value, i.number)}
                                     placeholder="Введите название свойства"
                                 />
                             </Col>
                             <Col md={4} className="m-1">
                                 <Form.Control
                                     value={i.description}
-                                    onChange={(e) => changeInfo("description", e.target.value, i.number)}
+                                    onChange={(e) => changeInfo('description', e.target.value, i.number)}
                                     placeholder="Введите описание свойства"
                                 />
                             </Col>
+                            <Col md={4} className="m-1">
+                                <Button 
+                                    variant={'outline-danger'}
+                                    onClick={() => removeInfo(i.number)}
+                                >
+                                    Удалить
+                                </Button>
+                            </Col>
                         </div>
-                    ))}
+                    )}
                 </Form>
             </Modal.Body>
             <Modal.Footer>
