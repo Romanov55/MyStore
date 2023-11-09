@@ -43,42 +43,44 @@ const BrandBar = observer(() => {
                 <h3>Бренды</h3>
                 <Button 
                     variant="outline-dark" 
-                    className="m-2"
+                    className="m-2 ms-auto"
                     onClick={() => setBrandVisable(true)}
+                    style={{width : 100}}
                 >
-                    Добавить бренд
+                    Добавить
                 </Button>
                 <CreateBrand show={brandVisable} onHide={() => setBrandVisable(false)}/>
-                {device.brands
-                    .slice()
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map(brand => 
-                        <ListGroup.Item
-                            style={{cursor:'pointer'}}
-                            border={brand.id === device.selectedBrand.id ? 'danger' : 'light'}
-                            key={brand.id}
-                            className="p-3 d-flex justify-content-between "
-                            onClick={() => device.setSelectedBrand(brand)}
-                        >
-                            {brand.name}
-                            <Button 
-                                variant="outline-dark" 
-                                className="m-2"
-                                onClick={() => toggleBrandVisibility(brand.id)} // Изменить видимость бренда
+                <div className="d-flex">
+                    {device.brands
+                        .slice()
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map(brand => 
+                            <ListGroup.Item
+                                style={{cursor:'pointer'}}
+                                border={brand.id === device.selectedBrand.id ? 'danger' : 'light'}
+                                key={brand.id}
+                                className="p-3 m-3 d-flex flex-column justify-content-between "
+                                onClick={() => device.setSelectedBrand(brand)}
                             >
-                                Изменить бренд
-                            </Button>
-                            <UpdateBrand show={visibleBrands[brand.id]} onHide={() => toggleBrandVisibility(brand.id)} brandToUpdate={brand} />
-
-                            <Button
-                                variant="danger"
-                                className="mt-2"
-                                onClick={() => handleDeleteBrand(brand.id)}
-                            >
-                                Удалить
-                            </Button>
-                        </ListGroup.Item>
-                )}
+                                {brand.name}
+                                <Button 
+                                    variant="outline-dark" 
+                                    className="m-2"
+                                    onClick={() => toggleBrandVisibility(brand.id)} // Изменить видимость бренда
+                                >
+                                    Изменить
+                                </Button>
+                                <UpdateBrand show={visibleBrands[brand.id]} onHide={() => toggleBrandVisibility(brand.id)} brandToUpdate={brand} />
+                                <Button
+                                    variant="danger"
+                                    className="mt-2"
+                                    onClick={() => handleDeleteBrand(brand.id)}
+                                >
+                                    Удалить
+                                </Button>
+                            </ListGroup.Item>
+                    )}
+                </div>
             </ListGroup>
         ) : null
     );

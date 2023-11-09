@@ -32,13 +32,13 @@ class DeviceController {
             if (Array.isArray(images)) {
                 // images - это массив изображений
                 for (const image of images) {
-                    const fileName = uuidv4() + ".jpg";
+                    const fileName = uuidv4() + path.extname(image.name);
                     image.mv(path.resolve(__dirname, '..', 'static', fileName));
                     imageUrls.push(fileName);
                 }
             } else {
                 // images - это единственное изображение
-                const fileName = uuidv4() + ".jpg";
+                const fileName = uuidv4() + path.extname(images.name);
                 images.mv(path.resolve(__dirname, '..', 'static', fileName));
                 imageUrls.push(fileName);
             }
@@ -72,50 +72,61 @@ class DeviceController {
 
     // Метод для получения списка устройств
     async getAll(req, res, next) {
-        let { brandId, typeId, limit, page } = req.query;
-        page = page || 1;
-        limit = limit || 10;
-        let offset = page * limit - limit;
+        try {
+            // ... ваш код запроса к базе данных ...
+            let { brandId, typeId, limit, page } = req.query;
+            page = page || 1;
+            limit = limit || 10;
+            let offset = page * limit - limit;
 
-        let devices;
+            let devices;
 
-        // Получаем устройства в зависимости от параметров запроса, включая DeviceImage
-        const includeOptions = [
-            { model: DeviceInfo, as: 'device_infos',  },
-            { model: DeviceImage, as: 'device_images' }
-        ];
+            // Получаем устройства в зависимости от параметров запроса, включая DeviceImage
+            const includeOptions = [
+                { model: DeviceInfo, as: 'device_infos',  },
+                { model: DeviceImage, as: 'device_images' }
+            ];
 
-        // Получаем устройства в зависимости от параметров запроса
-        if (!brandId && !typeId) {
-            devices = await Device.findAndCountAll({ limit, offset, include: includeOptions });
-        } else if (brandId && !typeId) {
-            devices = await Device.findAndCountAll({ where: { brandId }, limit, offset, include: includeOptions });
-        } else if (!brandId && typeId) {
-            devices = await Device.findAndCountAll({ where: { typeId }, limit, offset, include: includeOptions });
-        } else {
-            devices = await Device.findAndCountAll({ where: { typeId, brandId }, limit, offset, include: includeOptions });
+            // Получаем устройства в зависимости от параметров запроса
+            if (!brandId && !typeId) {
+                devices = await Device.findAndCountAll({ limit, offset, include: includeOptions });
+            } else if (brandId && !typeId) {
+                devices = await Device.findAndCountAll({ where: { brandId }, limit, offset, include: includeOptions });
+            } else if (!brandId && typeId) {
+                devices = await Device.findAndCountAll({ where: { typeId }, limit, offset, include: includeOptions });
+            } else {
+                devices = await Device.findAndCountAll({ where: { typeId, brandId }, limit, offset, include: includeOptions });
+            }
+
+            return res.json(devices);
+        } catch (error) {
+            console.error('Ошибка при получении устройств:', error);
+            return next(ApiError.internal('Ошибка при получении устройств'));
         }
-
-        return res.json(devices);
     }
 
     // Метод для получения информации о конкретном устройстве
     async getOne(req, res, next) {
-        const { id } = req.params;
-        const device = await Device.findOne({
-            where: { id },
-            include: [
-                { model: DeviceInfo, as: 'device_infos',  },
-                { model: DeviceImage, as: 'device_images' }
-            ]
-        });
+        try {
+            const { id } = req.params;
+            const device = await Device.findOne({
+                where: { id },
+                include: [
+                    { model: DeviceInfo, as: 'device_infos',  },
+                    { model: DeviceImage, as: 'device_images' }
+                ]
+            });
 
-        // Проверка на существование устройства
-        if (!device) {
-            return next(ApiError.badRequest('Продукт не найден'));
+            // Проверка на существование устройства
+            if (!device) {
+                return next(ApiError.badRequest('Продукт не найден'));
+            }
+
+            return res.json(device);
+        } catch (error) {
+            console.error('Ошибка при получении устройства', error);
+            return next(ApiError.internal('Ошибка при получении устройства'));
         }
-
-        return res.json(device);
     }
 
     // Метод для удаления устройства
@@ -229,13 +240,13 @@ class DeviceController {
                 if (Array.isArray(images_new)) {
                     // images - это массив изображений
                     for (const image of images_new) {
-                        const fileName = uuidv4() + ".jpg";
+                        const fileName = uuidv4() + path.extname(image.name);
                         image.mv(path.resolve(__dirname, '..', 'static', fileName));
                         imageUrls.push(fileName);
                     }
                 } else {
                     // images_new - это единственное изображение
-                    const fileName = uuidv4() + ".jpg";
+                    const fileName = uuidv4() + path.extname(images_new.name);
                     images_new.mv(path.resolve(__dirname, '..', 'static', fileName));
                     imageUrls.push(fileName);
                 }

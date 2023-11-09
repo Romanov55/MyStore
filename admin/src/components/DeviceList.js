@@ -73,6 +73,7 @@ const DeviceList = observer(() => {
                         variant="outline-dark"
                         className="m-2"
                         onClick={() => setDeviceVisable(true)}
+                        style={{width : 100}}
                     >
                         Добавить
                     </Button>

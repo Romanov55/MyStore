@@ -54,6 +54,11 @@ const TypeBrand = sequelize.define('type_brand', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
+const Banner = sequelize.define('banner', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    url: { type: DataTypes.STRING, allowNull: false }
+})
+
 Device.hasMany(DeviceImage);
 DeviceImage.belongsTo(Device)
 
@@ -84,4 +89,4 @@ DeviceInfo.belongsTo(Device)
 Type.belongsToMany(Brand, {through: TypeBrand})
 Brand.belongsToMany(Type, {through: TypeBrand})
 
-export {User, Basket, BasketDevice, Device, Type, Brand, Rating, TypeBrand, DeviceInfo, DeviceImage};
+export {User, Basket, BasketDevice, Device, Type, Brand, Rating, TypeBrand, DeviceInfo, DeviceImage, Banner};

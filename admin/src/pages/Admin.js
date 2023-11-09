@@ -7,6 +7,7 @@ import TypeBar from "../components/TypeBar";
 import DeviceList from "../components/DeviceList";
 import { observer } from "mobx-react-lite";
 import Dashboard from "../components/Dashboard";
+import BannersBar from "../components/Banners";
 
 const Admin = observer(()  => {
     const {device} = useContext(Context)
@@ -37,6 +38,7 @@ const Admin = observer(()  => {
                     <BrandBar/>
                     <TypeBar/>
                     <DeviceList/>
+                    <BannersBar/>
                 </Col>
             </Row>
         </Container>

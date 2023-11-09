@@ -44,44 +44,46 @@ const TypeBar = observer(() => {
                 <h3>Категории</h3>
                 <Button 
                     variant="outline-dark" 
-                    className="m-2"
+                    className="m-2 ms-auto"
                     onClick={() => setTypeVisable(true)}
+                    style={{width : 100}}
                 >
-                    Добавить категорию
+                    Добавить
                 </Button>
                 <CreateType show={typeVisable} onHide={() => setTypeVisable(false)}/>
-                {device.types
-                    .slice()
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map(type => 
-                    <ListGroup.Item
-                        style={{cursor:'pointer'}}
-                        onClick={() => device.setSelectedType(type)}
-                        key={type.id}
-                        className="p-3 d-flex justify-content-between"
-                    >
-                        {type.name}
-                        <Button 
-                                variant="outline-dark" 
-                                className="m-2"
-                                onClick={() => toggleTypeVisibility(type.id)} // Изменить видимость бренда
-                            >
-                                Изменить бренд
-                        </Button>
-                        <UpdateType show={visibleTypes[type.id]} onHide={() => toggleTypeVisibility(type.id)} typeToUpdate={type} />
-                        <Button
-                            variant="danger"
-                            className="mt-2"
-                            onClick={() => handleDeleteType(type.id)}
+                <div className="d-flex">
+                    {device.types
+                        .slice()
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map(type => 
+                        <ListGroup.Item
+                            style={{cursor:'pointer'}}
+                            onClick={() => device.setSelectedType(type)}
+                            key={type.id}
+                            className="p-3 m-3 d-flex flex-column justify-content-between"
                         >
-                            Удалить
-                        </Button>
-                    </ListGroup.Item>
-                )}
+                            {type.name}
+                            <Button 
+                                    variant="outline-dark" 
+                                    className="m-2"
+                                    onClick={() => toggleTypeVisibility(type.id)} // Изменить видимость бренда
+                                >
+                                    Изменить
+                            </Button>
+                            <UpdateType show={visibleTypes[type.id]} onHide={() => toggleTypeVisibility(type.id)} typeToUpdate={type} />
+                            <Button
+                                variant="danger"
+                                className="mt-2"
+                                onClick={() => handleDeleteType(type.id)}
+                            >
+                                Удалить
+                            </Button>
+                        </ListGroup.Item>
+                    )}
+                </div>
             </ListGroup>
         ) : null
     );
-    
 })
 
 export default TypeBar;

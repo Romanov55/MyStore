@@ -55,7 +55,6 @@ export const fetchDevices = async (page, limit = 5) => {
     return data;
 }
 
-
 export const fetchOneDevice = async (id) => {
     const {data} = await $host.get(`api/device/${id}`)
     return data
@@ -68,5 +67,20 @@ export const deleteDevice = async (id) => {
 
 export const updateDevice = async (id, updatedData) => {
     const { data } = await $host.patch(`api/device/${id}`, updatedData);
+    return data;
+}
+
+export const createBanner = async (banner) => {
+    const {data} = await $authHost.post('api/banner', banner)
+    return data
+}
+
+export const fetchBanners = async () => {
+    const {data} = await $host.get('api/banner')
+    return data
+}
+
+export const deleteBanner = async (bannerId) => {
+    const { data } = await $authHost.delete(`api/banner/${bannerId}`);
     return data;
 }
