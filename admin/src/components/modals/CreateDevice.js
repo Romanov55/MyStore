@@ -12,6 +12,8 @@ const CreateDevice = observer(({show, onHide}) => {
     const [files, setFiles] = useState([]);
     const [info, setInfo] = useState([]);
 
+    const [error, setError] = useState('');
+
     useEffect(() => {
         fetchTypes().then(data => device.setTypes(data))
         fetchBrands().then(data => device.setBrands(data))
@@ -41,13 +43,15 @@ const CreateDevice = observer(({show, onHide}) => {
     }
 
     const addDevice = async () => {
+        
         try {
             if (!device.selectedType || !device.selectedBrand || !name || !price) {
                 // Проверка на обязательные поля
-                console.error("Заполните все обязательные поля.");
+                setError('Заполните все обязательные поля.')
                 return;
             }
-    
+            
+            setError('')
             const formData = new FormData();
             formData.append("name", name);
             formData.append("price", price);
@@ -55,6 +59,10 @@ const CreateDevice = observer(({show, onHide}) => {
             formData.append("typeId", device.selectedType.id);
             formData.append("info", JSON.stringify(info));
     
+            if (files.length === 0) {
+                setError('Загрузите изображение')
+                return;
+            }
             // Добавление изображений
             for (let i = 0; i < files.length; i++) {
                 formData.append("images", files[i]);
@@ -76,6 +84,7 @@ const CreateDevice = observer(({show, onHide}) => {
     
             onHide(); // Закрыть модальное окно после успешного создания
         } catch (error) {
+            setError("Ошибка при создании устройства")
             console.error("Ошибка при создании устройства:", error);
             // Добавьте обработку ошибок для информирования пользователя
         }
@@ -151,6 +160,7 @@ const CreateDevice = observer(({show, onHide}) => {
                         </div>
                     )}
                     <br/>
+                    <div style={{color:'red'}}>{error}</div>
                     <Button
                         variant={"outline-dark"}
                         onClick={addInfo}
@@ -176,7 +186,9 @@ const CreateDevice = observer(({show, onHide}) => {
                             <Col md={4} className="m-1">
                                 <Button 
                                     variant={'outline-danger'}
-                                    onClick={() => removeInfo(i.number)}
+                                    onClick={() => {
+                                        removeInfo(i.number);
+                                    }}
                                 >
                                     Удалить
                                 </Button>

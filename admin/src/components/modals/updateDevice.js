@@ -13,6 +13,8 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     const [selectedType, setSelectedType] = useState(deviceToUpdate.typeId); // Выбранный тип
     const [selectedBrand, setSelectedBrand] = useState(deviceToUpdate.brandId); // Выбранный бренд
 
+    const [error, setError] = useState('');
+
     useEffect(() => {
         fetchTypes().then(data => device.setTypes(data));
         fetchBrands().then(data => device.setBrands(data));
@@ -43,6 +45,12 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
 
     const updateDeviceOnServer = async () => {
         try {
+            if (!device.selectedType || !device.selectedBrand || !name || !price) {
+                // Проверка на обязательные поля
+                setError('Заполните все обязательные поля.')
+                return;
+            }
+
             const formData = new FormData();
             formData.append("name", name);
             formData.append("price", price);
@@ -52,7 +60,11 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     
             // Создание массива для изображений
             const imagesArray = [];
-    
+            
+            if (files.length === 0) {
+                setError('Загрузите изображение')
+                return;
+            }
             for (let i = 0; i < files.length; i++) {
                 // Проверяем, является ли элемент файла (File) или объектом с URL
                 if (files[i] instanceof File) {
@@ -69,7 +81,8 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     
             // Обновление устройства
             await updateDevice(deviceToUpdate.id, formData);
-    
+
+            setError('')
             onHide(); // Закрыть модальное окно после успешного обновления
             const updatedDevices = await fetchDevices(device.page, device.limit); // Здесь вы можете указать нужные параметры запроса
             device.setDevices(updatedDevices.rows);
@@ -152,6 +165,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
                     )}
                     </div>
                     <br />
+                    <div style={{color:'red'}}>{error}</div>
                     <Button
                         variant={"outline-dark"}
                         onClick={addInfo}

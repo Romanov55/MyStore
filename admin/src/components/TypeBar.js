@@ -62,7 +62,7 @@ const TypeBar = observer(() => {
                             key={type.id}
                             className="p-3 m-3 d-flex flex-column justify-content-between"
                         >
-                            {type.name}
+                            <div style={{textAlign:'center'}}>{type.name}</div>
                             <Button 
                                     variant="outline-dark" 
                                     className="m-2"
@@ -73,7 +73,7 @@ const TypeBar = observer(() => {
                             <UpdateType show={visibleTypes[type.id]} onHide={() => toggleTypeVisibility(type.id)} typeToUpdate={type} />
                             <Button
                                 variant="danger"
-                                className="mt-2"
+                                className="m-2"
                                 onClick={() => handleDeleteType(type.id)}
                             >
                                 Удалить

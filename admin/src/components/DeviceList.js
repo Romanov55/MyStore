@@ -87,7 +87,7 @@ const DeviceList = observer(() => {
                         >
                             <DeviceItem device={item} />
                             <Button
-                                className="d-flex justify-content-center"
+                                className="d-flex justify-content-center m-auto"
                                 variant="danger"
                                 onClick={(e) => {
                                     e.stopPropagation(); // Предотвращение всплытия события

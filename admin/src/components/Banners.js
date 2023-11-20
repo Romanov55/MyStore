@@ -9,7 +9,6 @@ import Image from "react-bootstrap/Image"
 const BannersBar = observer(() => {
     const {banner} = useContext(Context)
 
-    console.log(banner)
     const handleDeleteBanner = async (typeId) => {
         try {
             await deleteBanner(typeId);

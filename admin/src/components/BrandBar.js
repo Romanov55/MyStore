@@ -59,10 +59,10 @@ const BrandBar = observer(() => {
                                 style={{cursor:'pointer'}}
                                 border={brand.id === device.selectedBrand.id ? 'danger' : 'light'}
                                 key={brand.id}
-                                className="p-3 m-3 d-flex flex-column justify-content-between "
+                                className="p-3 m-3 d-flex flex-column justify-content-center "
                                 onClick={() => device.setSelectedBrand(brand)}
                             >
-                                {brand.name}
+                                <div style={{textAlign:'center'}}>{brand.name}</div>
                                 <Button 
                                     variant="outline-dark" 
                                     className="m-2"
@@ -73,7 +73,7 @@ const BrandBar = observer(() => {
                                 <UpdateBrand show={visibleBrands[brand.id]} onHide={() => toggleBrandVisibility(brand.id)} brandToUpdate={brand} />
                                 <Button
                                     variant="danger"
-                                    className="mt-2"
+                                    className="m-2"
                                     onClick={() => handleDeleteBrand(brand.id)}
                                 >
                                     Удалить
