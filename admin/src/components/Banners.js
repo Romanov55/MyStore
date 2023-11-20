@@ -4,10 +4,12 @@ import { Context } from '../index';
 import { Button, ListGroup } from "react-bootstrap";
 import { deleteBanner, fetchBanners } from "../http/deviceAPI";
 import CreateBanner from "./modals/CreateBanner";
+import Image from "react-bootstrap/Image"
 
 const BannersBar = observer(() => {
     const {banner} = useContext(Context)
 
+    console.log(banner)
     const handleDeleteBanner = async (typeId) => {
         try {
             await deleteBanner(typeId);
@@ -43,7 +45,11 @@ const BannersBar = observer(() => {
                                 key={banner.id}
                                 className="p-3 m-3 d-flex flex-column justify-content-between "
                             >
-                                {banner.name}
+                                <Image
+                                    width={150}
+                                    height={150}
+                                    src={process.env.REACT_APP_API_URL + banner.url}
+                                />
                                 <Button
                                     variant="danger"
                                     className="mt-2"

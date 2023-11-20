@@ -1,29 +1,31 @@
+import { fileURLToPath } from 'url';
 import { Banner } from "../models/models.js";
+import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
 import ApiError from "../error/ApiError.js";
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 class BannerController {
     // Метод для создания нового баннера
     async create(req, res, next) {
         try {
-            const { banner } = req.files|| {};
-            console.log(banner)
+            const { banner }  = req.files || {};
 
             // Проверка на наличие изображения
             if (!banner) {
                 return next(ApiError.badRequest('Изображение не загружено'));
             }
-            
-             // Генерируем уникальное имя файлов с помощью uuid
-            const bannerUrl = [];
 
-            // banners - это единственное изображение
             const fileName = uuidv4() + path.extname(banner.name);
             banner.mv(path.resolve(__dirname, '..', 'static', fileName));
-            bannerUrl.push(fileName);
 
-            await Banner.create({ url: bannerUrl });
+            await Banner.create({ url: fileName });
             
-            return res.json({ message: 'Баннер добавлен', bannerUrl: bannerUrl });
+            return res.json({ message: 'Баннер добавлен', bannerUrl: fileName });
         } catch (error) {
             console.error('Ошибка при создании баннера', error);
             next(ApiError.internal(error.message))
@@ -54,6 +56,9 @@ class BannerController {
             if (!banner) {
                 return next(ApiError.notFound("Баннер не найден"));
             }
+
+            const imagePath = path.resolve(__dirname, '..', 'static', banner.url);
+            fs.unlinkSync(imagePath);
 
             await banner.destroy();
 

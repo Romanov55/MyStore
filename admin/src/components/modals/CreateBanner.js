@@ -10,7 +10,7 @@ const CreateBanner = ({show, onHide}) => {
 
     const selectFile = (e) => {
         const selectedFiles = e.target.files;
-        setFile([...file, ...selectedFiles]); // Add selected files to the array
+        setFile(selectedFiles);
     };
 
     const addBanner = async () => {
@@ -21,7 +21,7 @@ const CreateBanner = ({show, onHide}) => {
             }
     
             const formData = new FormData();
-            formData.append("banner", file);
+            formData.append("banner", file[0]);
     
             await createBanner(formData); // Отправить formData на сервер
             await fetchBanners(); // Загрузить обновленный список брендов

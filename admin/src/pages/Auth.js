@@ -31,7 +31,6 @@ const Auth = observer(() => {
             alert(e.message || 'Произошла ошибка при входе.'); // Обработка ошибки с учетом возможного отсутствия message
         }
     }
-    
 
     return (
         <Container 
