@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Modal, Button, Form, Dropdown, Col, Card } from "react-bootstrap";
 import { Context } from "../..";
-import { fetchBrands, fetchDevices, fetchTypes, updateDevice } from "../../http/deviceAPI";
+import { deleteDevice, fetchBrands, fetchDevices, fetchTypes, updateDevice } from "../../http/deviceAPI";
 import { observer } from "mobx-react";
 
 const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
@@ -12,6 +12,8 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
     const [info, setInfo] = useState(deviceToUpdate.device_infos || []);
     const [selectedType, setSelectedType] = useState(deviceToUpdate.typeId); // Выбранный тип
     const [selectedBrand, setSelectedBrand] = useState(deviceToUpdate.brandId); // Выбранный бренд
+    
+    const [confirmVisible, setConfirmVisible] = useState(false);
 
     const [error, setError] = useState('');
 
@@ -43,6 +45,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
         setInfo(info.filter(i => i.number !== number))
     }
 
+    // Отправляем изменённый товар
     const updateDeviceOnServer = async () => {
         try {
             if (!device.selectedType || !device.selectedBrand || !name || !price) {
@@ -89,6 +92,22 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
             device.setTotalCount(updatedDevices.count);
         } catch (error) {
             console.error("Ошибка при обновлении устройства:", error);
+        }
+    };
+
+    // Удаление девайса
+    const handleDeleteDevice = async (deviceId) => {
+        try {
+            await deleteDevice(deviceId);
+            // После успешного удаления, очистите текущий список устройств
+            device.setDevices([]);
+            // Загрузите новый список устройств
+            const data = await fetchDevices(device.page, device.limit);
+            // Обновите список устройств с новыми данными
+            device.setDevices(data.rows);
+            device.setTotalCount(data.count);
+        } catch (error) {
+            console.error("Ошибка при удалении устройства:", error);
         }
     };
 
@@ -201,6 +220,30 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
+                <Button
+                    width={150}
+                    className={`me-auto ${confirmVisible ? 'd-none' : ''}`}
+                    variant="danger"
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent event bubbling
+                        setConfirmVisible(true);
+                    }}
+                >
+                    Удалить
+                </Button>
+                {confirmVisible && (
+                    <Button
+                        className={`me-auto`}
+                        width={150}
+                        variant="danger"
+                        onClick={(e) => {
+                            e.stopPropagation(); // Prevent event bubbling
+                            handleDeleteDevice(deviceToUpdate.id);
+                        }}
+                    >
+                        Подтверждение
+                    </Button>
+                )}
                 <Button variant="outline-danger" onClick={onHide}>
                     Закрыть
                 </Button>

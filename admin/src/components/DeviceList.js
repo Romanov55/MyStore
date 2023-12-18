@@ -11,22 +11,6 @@ import CreateDevice from "./modals/CreateDevice";
 const DeviceList = observer(() => {
     const { device } = useContext(Context);
 
-    // Удаление девайса
-    const handleDeleteDevice = async (deviceId) => {
-        try {
-            await deleteDevice(deviceId);
-            // После успешного удаления, очистите текущий список устройств
-            device.setDevices([]);
-            // Загрузите новый список устройств
-            const data = await fetchDevices(device.page, device.limit);
-            // Обновите список устройств с новыми данными
-            device.setDevices(data.rows);
-            device.setTotalCount(data.count);
-        } catch (error) {
-            console.error("Ошибка при удалении устройства:", error);
-        }
-    };
-
     const [visibleDevices, setVisibleDevices] = useState({});
     const [search, setSearch] = useState('');
     const [deviceVisable, setDeviceVisable] = useState(false)
@@ -86,16 +70,6 @@ const DeviceList = observer(() => {
                             onClick={() => toggleDeviceVisibility(item.id)}
                         >
                             <DeviceItem device={item} />
-                            <Button
-                                className="d-flex justify-content-center m-auto"
-                                variant="danger"
-                                onClick={(e) => {
-                                    e.stopPropagation(); // Предотвращение всплытия события
-                                    handleDeleteDevice(item.id);
-                                }}
-                            >
-                                Удалить
-                            </Button>
                             <UpdateDevice show={visibleDevices[item.id]} onHide={() => toggleDeviceVisibility(item.id)} deviceToUpdate={item} />
                         </div>
                     ))}

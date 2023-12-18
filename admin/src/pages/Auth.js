@@ -14,8 +14,14 @@ const Auth = observer(() => {
     const isLogin = location.pathname === LOGIN_ROUTE;
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const handleKeyDown = async (e) => {
+        if (e.key === 'Enter') {
+            await handleSubmit();
+        }
+    };
     
-    const click = async () => {
+    const handleSubmit = async () => {
         try {
             if (isLogin) {
                 const data = await login(email, password); // Предполагается, что login правильно возвращает данные пользователя
@@ -23,6 +29,7 @@ const Auth = observer(() => {
                     user.setUser(data); // Установите пользователя из полученных данных
                     user.setIsAuth(true);
                     history.push(ADMIN_ROUTE);
+                    window.location.reload(false);
                 } else {
                     alert('Неверные данные');
                 }
@@ -45,6 +52,7 @@ const Auth = observer(() => {
                         placeholder="Введите ваш логин..."
                         value={email}
                         onChange={e => setEmail(e.target.value)}
+                        onKeyDown={handleKeyDown}
                     />
                     <Form.Control
                         className="mt-3"
@@ -52,11 +60,12 @@ const Auth = observer(() => {
                         value={password}
                         type="password"
                         onChange={e => setPassword(e.target.value)}
+                        onKeyDown={handleKeyDown}
                     />
                     <div className="d-flex justify-content-between align-items-center mt-3 ps-3">
                         <Button
                             variant="outline-success"
-                            onClick={click}
+                            onClick={handleSubmit}
                         >
                             Войти
                         </Button>

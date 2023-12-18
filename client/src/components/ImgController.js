@@ -16,10 +16,10 @@ const ImageController = ({ device }) => {
 
     return (
         <div className='d-flex'>
-            <div className="thumbnail-device d-flex flex-column overflow-y-auto" style={{width : '30%', height : 300}}>
+            <div className="m-2 thumbnail-device d-flex flex-column overflow-y-auto" style={{width : '30%', height : 450}}>
                 {device.device_images && device.device_images.map((image, index) => (
                     <img
-                        style={{ width: '100%' }}
+                        className='m-1'
                         key={index}
                         src={process.env.REACT_APP_API_URL + image.url}
                         alt={image.name}
@@ -27,7 +27,7 @@ const ImageController = ({ device }) => {
                     />
                 ))}
             </div>
-            <div className="main-image" style={{ width: '70%' }}>
+            <div className="main-image m-2" style={{ width: '70%' }}>
                 {selectedImage && (
                     <img
                         style={{ width: '100%' }}

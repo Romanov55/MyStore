@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { observer } from 'mobx-react';
 import { Context } from '../index';
 import { Button, ListGroup } from "react-bootstrap";
@@ -20,6 +20,20 @@ const BannersBar = observer(() => {
         }
         
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const banners = await fetchBanners();
+                banner.setBanners(banners);
+                // Установите bannersVisable в true или false в соответствии с вашей логикой
+                banner.setBannersVisable(true); 
+            } catch (error) {
+                console.error("Ошибка при получении баннеров:", error);
+            }
+        };
+        fetchData();
+    }, [banner]);
 
     const [bannerVisable, setBannerVisable] = useState(false)
 
@@ -45,8 +59,8 @@ const BannersBar = observer(() => {
                                 className="p-3 m-3 d-flex flex-column justify-content-between "
                             >
                                 <Image
-                                    width={150}
-                                    height={150}
+                                    width={350}
+                                    height={200}
                                     src={process.env.REACT_APP_API_URL + banner.url}
                                 />
                                 <Button

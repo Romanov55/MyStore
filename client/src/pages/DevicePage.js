@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Container } from "react-bootstrap";
-import bagStar from '../components/assets/bigStar.png'
 import { useParams } from "react-router-dom/cjs/react-router-dom";
 import { fetchOneDevice } from "../http/deviceAPI";
 import ImgController from "../components/ImgController";
@@ -46,43 +45,28 @@ const DevicePage = observer(() => {
 
     return (
         <Container className="mt-3">
-            <div className="d-flex">
-                <Col md={4}>
-                    {/* Отображение изображения устройства */}
+            <div className="d-flex m-1">
+                <Col md={6}>
+                    <h2 className="m-2">{device.name}</h2>
                     <ImgController device={device}/>
                 </Col>
-                <Col md={4}>
-                    <div className="d-flex flex-column align-items-center">
-                        {/* Отображение имени устройства */}
-                        <h2>{device.name}</h2>
-                        <div
-                            className="d-flex align-items-center justify-content-center"
-                            style={{ background: `url(${bagStar}) no-repeat center center`, width: 240, height: 240, backgroundSize: 'cover', fontSize: 64 }}
-                        >
-                            {/* Отображение рейтинга устройства */}
-                            {device.rating}
-                        </div>
-                    </div>
-                </Col>
-                <Col md={4}>
+                <Col md={6}>
+                    <h3 className="d-flex justify-content-start m-3">{device.price} Т</h3>
                     <Card
-                        className="d-flex flex-column align-content-center justify-content-around"
-                        style={{ width: 300, height: 300, fontSize: 32, border: '5px solid lightgray' }}
+                        className="d-flex flex-column align-content-center justify-content-around m-2"
+                        style={{ fontSize: 32, border: '5px solid lightgray' }}
                     >
-                        <h3 className="d-flex justify-content-center">{device.price} Т</h3>
-                        {/* Кнопка для добавления в корзину */}
                         <Button variant="outline-dark" className="m-3" onClick={() => addProductBasket(device.id, device.name, device.price, device.device_images[0].url)}>Добавить в корзину</Button>
+                {device.device_infos && device.device_infos.map((info, index) =>
+                    <div className="m-2" key={info.id} style={{ background: index % 2 === 0 ? 'lightgray' : 'transparent', padding: 10 }}>
+                        {info.title}: {info.description}
+                    </div>
+                )}
                     </Card>
                 </Col>
             </div>
             <div className="d-flex flex-column m-3">
-                <h1>Характеристики</h1>
-                {device.device_infos && device.device_infos.map((info, index) =>
-                    <div key={info.id} style={{ background: index % 2 === 0 ? 'lightgray' : 'transparent', padding: 10 }}>
-                        {/* Отображение характеристик устройства */}
-                        {info.title}: {info.description}
-                    </div>
-                )}
+
             </div>
         </Container>
     );

@@ -8,23 +8,6 @@ import CreateBrand from "./modals/CreateBrand";
 
 const BrandBar = observer(() => {
     const { device } = useContext(Context);
-
-    // Удаление бренда
-    const handleDeleteBrand = async (brandId) => {
-        try {
-            const associatedDevices = device.devices.filter(device => device.brandId === brandId);
-            if (associatedDevices.length > 0) {
-                // Есть связанные товары, выведите сообщение об ошибке
-                alert('Нельзя удалить бренд, у которого есть связанные товары.');
-            } else {
-                // Нет связанных товаров, можно удалить бренд
-                await deleteBrand(brandId);
-                device.setBrands(await fetchBrands());
-            }
-        } catch (error) {
-            console.error("Ошибка при удалении бренда:", error);
-        }
-    }
     
     const [visibleBrands, setVisibleBrands] = useState({}); // Хранить видимость для каждого бренда
     const [brandVisable, setBrandVisable] = useState(false)
@@ -71,13 +54,6 @@ const BrandBar = observer(() => {
                                     Изменить
                                 </Button>
                                 <UpdateBrand show={visibleBrands[brand.id]} onHide={() => toggleBrandVisibility(brand.id)} brandToUpdate={brand} />
-                                <Button
-                                    variant="danger"
-                                    className="m-2"
-                                    onClick={() => handleDeleteBrand(brand.id)}
-                                >
-                                    Удалить
-                                </Button>
                             </ListGroup.Item>
                     )}
                 </div>

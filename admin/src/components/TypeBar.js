@@ -11,23 +11,6 @@ const TypeBar = observer(() => {
 
     const [typeVisable, setTypeVisable] = useState(false)
 
-    // Удаление типа
-    const handleDeleteType = async (typeId) => {
-        try {
-            const associatedDevices = device.devices.filter(device => device.typeId === typeId);
-            if (associatedDevices.length > 0) {
-                alert('Нельзя удалить категорию, у которой есть связанные товары.');
-            } else {
-                await deleteType(typeId);
-                // обновление брендов на странице
-                device.setTypes(await fetchTypes());
-            }
-        } catch (error) {
-            console.error("Ошибка при удалении бренда:", error);
-        }
-        
-    }
-
     const [visibleTypes, setVisibleTypes] = useState({}); // Хранить видимость для каждого бренда
 
     const toggleTypeVisibility = (typeId) => {
@@ -71,13 +54,6 @@ const TypeBar = observer(() => {
                                     Изменить
                             </Button>
                             <UpdateType show={visibleTypes[type.id]} onHide={() => toggleTypeVisibility(type.id)} typeToUpdate={type} />
-                            <Button
-                                variant="danger"
-                                className="m-2"
-                                onClick={() => handleDeleteType(type.id)}
-                            >
-                                Удалить
-                            </Button>
                         </ListGroup.Item>
                     )}
                 </div>
