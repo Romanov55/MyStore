@@ -1,4 +1,9 @@
 import {makeAutoObservable} from 'mobx'
+import { configure } from 'mobx';
+
+configure({
+    enforceActions: 'never', // или 'observed' или 'always'
+});
 
 export default class DeviceStore {
     constructor() {

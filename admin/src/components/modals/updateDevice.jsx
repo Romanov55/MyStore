@@ -173,7 +173,7 @@ const UpdateDevice = observer(({ show, onHide, deviceToUpdate }) => {
                                 <Card key={index} className="mt-2 me-2 p-1 d-flex flex-column flex-wrap">
                                     <img
                                         className="mb-2"
-                                        src={file.url ? process.env.REACT_APP_API_URL + file.url : URL.createObjectURL(file)}
+                                        src={file.url ? import.meta.env.VITE_APP_API_BASE + file.url : URL.createObjectURL(file)}
                                         alt={`Выбранное изображение`}
                                         style={{ maxWidth: "100px" }}
                                     />

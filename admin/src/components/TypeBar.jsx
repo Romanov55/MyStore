@@ -34,7 +34,7 @@ const TypeBar = observer(() => {
                     Добавить
                 </Button>
                 <CreateType show={typeVisable} onHide={() => setTypeVisable(false)}/>
-                <div className="d-flex">
+                <div className="d-flex flex-wrap">
                     {device.types
                         .slice()
                         .sort((a, b) => a.name.localeCompare(b.name))

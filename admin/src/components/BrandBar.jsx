@@ -33,7 +33,7 @@ const BrandBar = observer(() => {
                     Добавить
                 </Button>
                 <CreateBrand show={brandVisable} onHide={() => setBrandVisable(false)}/>
-                <div className="d-flex">
+                <div className="d-flex flex-wrap">
                     {device.brands
                         .slice()
                         .sort((a, b) => a.name.localeCompare(b.name))

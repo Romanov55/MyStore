@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { Context } from '../index';
 import DeviceItem from "./DeviceItem";
 import { Button } from "react-bootstrap";
-import { deleteDevice, fetchDevices } from "../http/deviceAPI";
 import Pages from "./Pages";
 import UpdateDevice from "./modals/updateDevice";
 import CreateDevice from "./modals/CreateDevice";

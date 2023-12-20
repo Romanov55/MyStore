@@ -13,7 +13,7 @@ const DeviceItem = ({device}) => {
                     height={150}
                     src={
                         device.device_images.length > 0
-                            ? process.env.REACT_APP_API_URL + device.device_images[device.device_images.length - 1].url
+                            ? import.meta.env.VITE_APP_API_BASE + device.device_images[device.device_images.length - 1].url
                             : ''
                     }
                 />

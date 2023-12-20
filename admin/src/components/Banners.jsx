@@ -61,7 +61,7 @@ const BannersBar = observer(() => {
                                 <Image
                                     width={350}
                                     height={200}
-                                    src={process.env.REACT_APP_API_URL + banner.url}
+                                    src={import.meta.env.VITE_APP_API_BASE + banner.url}
                                 />
                                 <Button
                                     variant="danger"
